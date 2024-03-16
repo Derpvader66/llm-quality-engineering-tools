@@ -1,15 +1,14 @@
 import streamlit as st
+from langchain.chains import ChatCompletionChain
 from langchain.llms import OpenAI
 
-import langchain.chains
-dir(langchain.chains)
 
 
 # Initialize the OpenAI model with the API key from Streamlit secrets
 openai_model = OpenAI(api_key=st.secrets["OPEN_AI_API_KEY"])
 
 # Set up the ChatCompletionChain with the OpenAI model
-#chat_chain = ChatCompletionChain(llm=openai_model)
+chat_chain = ChatCompletionChain(llm=openai_model)
 
 # Streamlit app layout
 st.title('Advanced Chatbot with Langchain and OpenAI')

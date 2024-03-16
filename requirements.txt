@@ -9,3 +9,4 @@ numpy
 unstructured
 python-docx
 langchain-community
+PyPDF2

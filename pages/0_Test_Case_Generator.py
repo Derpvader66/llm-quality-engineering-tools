@@ -23,10 +23,7 @@ Prerequisites:
 Do some Stuff before you do other stuff
 
 Steps:
-1. Open the application
-2. Enter valid username and password
-3. Click on the login button
-Expected Result: User should be successfully logged in and redirected to the home page.
+ Step 1
 """
 st.header("Example Test Case Format")
 st.write(example_test_case)

@@ -38,7 +38,7 @@ if uploaded_file is not None:
             n=1,
             stop=None,
             temperature=0.7)
-            test_cases = response.choices[0].message.content.strip  # Update the test_cases variable
+            test_cases = response.choices[0].message.content  # Update the test_cases variable
             st.write("Generated Test Cases:")
             st.write(test_cases)
         except Exception as e:

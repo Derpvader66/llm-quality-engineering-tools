@@ -6,6 +6,7 @@ from langchain.prompts.prompt import PromptTemplate
 from PyPDF2 import PdfReader
 
 # Streamlit app title
+st.set_page_config(page_title="Quality Engineering Chatbot", page_icon=":memo:")
 st.title("Quality Engineering Chatbot")
 
 # OpenAI API key
@@ -37,34 +38,51 @@ prompt = PromptTemplate(
 conversation = ConversationChain(
     llm=chat,
     prompt=prompt,
-    memory=ConversationBufferMemory(memory_key="history", input_key="input")
+    memory=ConversationBufferMemory(memory_key="history", input_key="input", human_prefix="Human", ai_prefix="Assistant")
 )
 
 # File upload
 uploaded_file = st.file_uploader("Upload Business Process Documentation (PDF)", type=["pdf"])
 
 if uploaded_file is not None:
-    # Read the uploaded PDF file
-    pdf_reader = PdfReader(uploaded_file)
-    documentation_text = ""
-    for page in pdf_reader.pages:
-        documentation_text += page.extract_text()
+    try:
+        # Read the uploaded PDF file
+        pdf_reader = PdfReader(uploaded_file)
+        documentation_text = ""
+        for page in pdf_reader.pages:
+            documentation_text += page.extract_text()
 
-    # Display the extracted text
-    st.write("Extracted Text:")
-    st.write(documentation_text)
+        # Display the extracted text
+        st.write("Extracted Text:")
+        st.write(documentation_text)
 
-    # Chat interface
-    st.header("Chat with the Quality Engineering Assistant")
+        # Chat interface
+        st.header("Chat with the Quality Engineering Assistant")
 
-    # Get user input
-    user_input = st.text_input("You:", "")
+        # Get user input
+        user_input = st.text_input("You:", "")
 
-    if user_input:
-        # Pass user input and documentation to the conversation chain
-        output = conversation.predict(input=user_input, documentation=documentation_text)
-        
-        # Display assistant's response
-        st.text_area("Assistant:", value=output, height=200, max_chars=None)
+        if user_input:
+            # Pass user input and documentation to the conversation chain
+            output = conversation.predict(input=user_input, documentation=documentation_text)
+
+            # Display assistant's response
+            st.text_area("Assistant:", value=output, height=200, max_chars=None)
+
+        # Clear chat history button
+        if st.button("Clear Chat History"):
+            conversation.memory.clear()
+
+        # Download test cases button
+        if st.button("Download Test Cases"):
+            st.download_button(
+                label="Download",
+                data=output,
+                file_name="test_cases.txt",
+                mime="text/plain"
+            )
+
+    except Exception as e:
+        st.error(f"Error occurred while reading the PDF file: {str(e)}")
 else:
     st.write("Please upload a business process documentation file (PDF) to generate test cases.")

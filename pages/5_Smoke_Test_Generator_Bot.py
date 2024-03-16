@@ -13,17 +13,6 @@ openai_api_key = st.secrets["OPENAI_API_KEY"]
 # Initialize the OpenAI chat model
 chat = ChatOpenAI(openai_api_key=openai_api_key)
 
-class TestBuilder(CargoCultContainer):
-    def __init__(self):
-        super().__init__()  # Initialize the parent class
-        # self.clear_session()
-        self.repo_path = "/Users/franklin.williams/Developer/Socrata/platform-ui"
-
-    def get_page_title(self):
-        return "### Test Bot"
-
-    def get_page_description(self):
-        return "Test bot takes the output of `git diff` for an individual file, as well as the existing test file and modifies it.\n If running locally, it will attempt to load all diffs in the repo provided. If not running locally, just past the git diff for an individual file and the test file"
 
 # Create a ConversationChain with a specific prompt
 template = """

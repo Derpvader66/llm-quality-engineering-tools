@@ -10,3 +10,4 @@ unstructured
 python-docx
 langchain-community
 PyPDF2
+spacy

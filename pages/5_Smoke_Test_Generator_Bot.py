@@ -25,7 +25,17 @@ This test case verifies the steps for the [Workflow Name] workflow. Summarize th
 Prerequisites:
 List any prerequisites for the test case like user roles, sample data, etc
 Test Steps:
-<table> <thead> <tr> <th>Test Steps</th> <th>Expected Result</th> </tr> </thead> <tbody> <tr> <td>1. Briefly describe the first step to execute the test case</td> <td>Describe the expected result of the first test step</td> </tr> <tr> <td>2. Briefly describe the second step to execute the test case</td> <td>Describe the expected result of the second test step</td> </tr> <tr> <td>3. Briefly describe the third step to execute the test case</td> <td>Describe the expected result of the third test step</td> </tr> <tr> <td>4. Briefly describe the fourth step to execute the test case</td> <td>Describe the expected result of the fourth test step</td> </tr> <tr> <td>5. Briefly describe the fifth step to execute the test case</td> <td>Describe the expected result of the fifth test step</td> </tr> </tbody> </table>
+| **Test Steps** | **Expected Result** |
+| --- | --- |
+| 1. Navigate to the case and select the item with multiple documents | Event 72 details page displays |
+| --- | --- |
+| 2. Click the Documents icon or button |
+ | Document selection dialog opens | Dialog titled "Select Document" displays with list of documents (matches solution for updated Select Document dialog) |
+| 3. Select multiple document checkboxes | Checkboxes next to Doc1, Doc3 and Doc5 are checked (matches solution for added checkboxes) |
+| 4. Click Continue |
+ | Document viewer opens with Doc1 displayed |
+| 5. Verify other selected documents are listed | Doc3 and Doc5 names display in order of oldest to newest (matches solution for listing selected docs oldest to newest) |
+| 6. Click the document names to change docs | Contents of Doc3 and Doc5 display after clicking their names (matches solution for changing displayed doc) |
 Populate the [Test Case ID] and [Workflow Name] fields. In the Description, summarize the purpose of the workflow being tested. List any prerequisite user roles, sample data, or configuration needed for the test.
 In the Test Steps table, provide 5 concise steps to execute the test case. For each step, describe the expected result that should occur if the workflow is functioning properly.
 Focus on the key interactions a user would have with the system to complete the workflow. The test steps should be high-level and easy for testers to follow.

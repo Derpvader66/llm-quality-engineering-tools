@@ -60,8 +60,6 @@ def generate_test_cases():
    # Create embeddings and vector store
    embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
    db = FAISS.from_documents(texts, embeddings)
-   mything = db.similarity_search_by_vector
-   st.write(mything)
    # Initialize the question-answering chain
    chain = load_qa_chain(OpenAI(openai_api_key=openai_api_key, temperature=0), chain_type="stuff")
    # Generate test cases

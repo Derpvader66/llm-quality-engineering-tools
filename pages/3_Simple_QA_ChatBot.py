@@ -19,12 +19,13 @@ You are a quality engineering assistant. Your role is to help with various aspec
 You can provide guidance on test planning, test case design, defect management, and continuous improvement.
 Feel free to ask for more details or clarification if needed.
 
+History:
 {history}
-Human: {human_input}
+Human: {input}
 Assistant:"""
 
 prompt = PromptTemplate(
-    input_variables=["history", "human_input"],
+    input_variables=["history", "input"],
     template=prompt_template
 )
 
@@ -32,7 +33,7 @@ prompt = PromptTemplate(
 conversation = ConversationChain(
     llm=chat,
     prompt=prompt,
-    memory=ConversationBufferMemory(human_prefix="Human", ai_prefix="Assistant")
+    memory=ConversationBufferMemory(chat_memory={"human_prefix": "Human", "ai_prefix": "Assistant"})
 )
 
 # Chat interface
@@ -43,7 +44,7 @@ user_input = st.text_input("You:", "")
 
 if user_input:
     # Pass user input to the conversation chain
-    output = conversation.predict(human_input=user_input)
+    output = conversation.predict(input=user_input)
     
     # Display assistant's response
     st.text_area("Assistant:", value=output, height=200, max_chars=None)

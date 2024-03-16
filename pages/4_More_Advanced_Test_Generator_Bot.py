@@ -1,88 +1,47 @@
 import streamlit as st
-from langchain.chat_models import ChatOpenAI
-from langchain.chains import ConversationChain
-from langchain.memory import ConversationBufferMemory
-from langchain.prompts.prompt import PromptTemplate
+import openai
 from PyPDF2 import PdfReader
 
-# Streamlit app title
-st.set_page_config(page_title="Quality Engineering Chatbot", page_icon=":memo:")
-st.title("Quality Engineering Chatbot")
+st.set_page_config(page_title="Test Case Generator", page_icon=":memo:")
+st.title("Test Case Generator")
 
-# OpenAI API key
-openai_api_key = st.secrets["OPENAI_API_KEY"]
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
-# Initialize the OpenAI chat model
-chat = ChatOpenAI(openai_api_key=openai_api_key)
-
-# Create a ConversationChain with a specific prompt
-template = """
-You are a quality engineering assistant. Your role is to help with various aspects of the quality engineering process.
-You can provide guidance on test planning, test case design, defect management, and continuous improvement.
-Feel free to ask for more details or clarification if needed.
-
-Business Process Documentation:
-{documentation}
-
-History:
-{history}
-Human: {input}
-Assistant:"""
-
-prompt = PromptTemplate(
-    input_variables=["documentation", "history", "input"],
-    template=template
-)
-
-# Initialize ConversationChain with the prompt and memory
-conversation = ConversationChain(
-    llm=chat,
-    prompt=prompt,
-    memory=ConversationBufferMemory(memory_key="history", input_key="input")
-)
-
-# File upload
-uploaded_file = st.file_uploader("Upload Business Process Documentation (PDF)", type=["pdf"])
-
-documentation_text = ""
+uploaded_file = st.file_uploader("Upload Business Process Document (PDF)", type=["pdf"])
 
 if uploaded_file is not None:
     try:
-        # Read the uploaded PDF file
         pdf_reader = PdfReader(uploaded_file)
-        documentation_text = ""
+        document_text = ""
         for page in pdf_reader.pages:
-            documentation_text += page.extract_text()
-
-        # Display the extracted text
-        st.write("Extracted Text:")
-        st.write(documentation_text)
-
+            document_text += page.extract_text()
+        st.write("Uploaded Document:")
+        st.write(document_text)
     except Exception as e:
         st.error(f"Error occurred while reading the PDF file: {str(e)}")
 
-# Chat interface
-st.header("Chat with the Quality Engineering Assistant")
+    prompt = f"Generate test cases for the following business process document:\n\n{document_text}\n\nTest Cases:"
+    
+    if st.button("Generate Test Cases"):
+        try:
+            response = openai.Completion.create(
+                engine="text-davinci-003",
+                prompt=prompt,
+                max_tokens=1000,
+                n=1,
+                stop=None,
+                temperature=0.7,
+            )
+            test_cases = response.choices[0].text.strip()
+            st.write("Generated Test Cases:")
+            st.write(test_cases)
+        except Exception as e:
+            st.error(f"Error occurred while generating test cases: {str(e)}")
 
-# Get user input
-user_input = st.text_input("You:", "")
-
-if user_input:
-    # Pass user input and documentation to the conversation chain
-    output = conversation.predict(input=user_input, documentation=documentation_text)
-
-    # Display assistant's response
-    st.text_area("Assistant:", value=output, height=200, max_chars=None)
-
-# Clear chat history button
-if st.button("Clear Chat History"):
-    conversation.memory.clear()
-
-# Download test cases button
-if output:
-    st.download_button(
-        label="Download Test Cases",
-        data=output,
-        file_name="test_cases.txt",
-        mime="text/plain"
-    )
+    if test_cases:
+        st.download_button(
+            label="Download Test Cases",
+            data=test_cases,
+            file_name="test_cases.txt",
+            mime="text/plain"
+        )

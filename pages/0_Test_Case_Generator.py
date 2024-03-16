@@ -12,8 +12,6 @@ st.set_page_config(page_title="Test Case Generator", page_icon=":memo:")
 # App title and description
 st.title("Test Case Generator")
 st.markdown("Upload your business process documents and user documentation files to generate test cases.")
-# Sidebar
-st.sidebar.header("OpenAI API Key")
 openai_api_key = st.secrets["OPENAI_API_KEY"]
 # openai_api_key = st.sidebar.text_input("Enter your OpenAI API Key", type="password")
 # Example test case format

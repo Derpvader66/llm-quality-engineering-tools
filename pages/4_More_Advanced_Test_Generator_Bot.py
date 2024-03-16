@@ -1,11 +1,12 @@
 import streamlit as st
-import openai
+from openai import OpenAI
+
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 from PyPDF2 import PdfReader
 
 st.set_page_config(page_title="Test Case Generator", page_icon=":memo:")
 st.title("Test Case Generator")
 
-openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 uploaded_file = st.file_uploader("Upload Business Process Document (PDF)", type=["pdf"])
 
@@ -26,14 +27,12 @@ if uploaded_file is not None:
     
     if st.button("Generate Test Cases"):
         try:
-            response = openai.Completion.create(
-                engine="text-davinci-003",
-                prompt=prompt,
-                max_tokens=1000,
-                n=1,
-                stop=None,
-                temperature=0.7,
-            )
+            response = client.completions.create(engine="text-davinci-003",
+            prompt=prompt,
+            max_tokens=1000,
+            n=1,
+            stop=None,
+            temperature=0.7)
             test_cases = response.choices[0].text.strip()  # Update the test_cases variable
             st.write("Generated Test Cases:")
             st.write(test_cases)

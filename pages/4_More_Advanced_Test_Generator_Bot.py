@@ -9,6 +9,8 @@ openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 uploaded_file = st.file_uploader("Upload Business Process Document (PDF)", type=["pdf"])
 
+test_cases = ""  # Initialize the test_cases variable
+
 if uploaded_file is not None:
     try:
         pdf_reader = PdfReader(uploaded_file)
@@ -32,7 +34,7 @@ if uploaded_file is not None:
                 stop=None,
                 temperature=0.7,
             )
-            test_cases = response.choices[0].text.strip()
+            test_cases = response.choices[0].text.strip()  # Update the test_cases variable
             st.write("Generated Test Cases:")
             st.write(test_cases)
         except Exception as e:

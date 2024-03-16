@@ -1,53 +1,34 @@
 import streamlit as st
-from openai import OpenAI
+from langchain.chains import ChatCompletionChain
+from langchain.llms import OpenAI
 
-client = OpenAI()
+# Initialize the OpenAI model with the API key from Streamlit secrets
+openai_model = OpenAI(api_key=st.secrets["OPEN_AI_API_KEY"])
 
-st.set_page_config(page_title="Test Case Generator", page_icon=":memo:")
-st.title("Test Case Generator")
+# Set up the ChatCompletionChain with the OpenAI model
+chat_chain = ChatCompletionChain(llm=openai_model)
 
-openai_api_key = st.secrets["OPENAI_API_KEY"]
-model_name = "gpt-4"
+# Streamlit app layout
+st.title('Advanced Chatbot with Langchain and OpenAI')
 
-uploaded_file = st.file_uploader("Upload Business Process Document (PDF)", type=["pdf"])
+# Chat history stored in session state to maintain context
+if 'chat_history' not in st.session_state:
+    st.session_state['chat_history'] = []
 
-test_cases = ""  # Initialize the test_cases variable
+# Using a text input to send messages to the chatbot
+user_message = st.text_input('You: ', '')
 
-if uploaded_file is not None:
-    try:
-        from PyPDF2 import PdfReader
-        pdf_reader = PdfReader(uploaded_file)
-        document_text = ""
-        for page in pdf_reader.pages:
-            document_text += page.extract_text()
-        st.write("Uploaded Document:")
-        st.write(document_text)
-    except Exception as e:
-        st.error(f"Error occurred while reading the PDF file: {str(e)}")
-
-    prompt = f"Generate test cases for the following business process document:\n\n{document_text}\n\nTest Cases:"
+# Displaying the response only when the user sends a message
+if user_message:
+    # Append the user message to the chat history
+    st.session_state['chat_history'].append({"speaker": "user", "text": user_message})
     
-    if st.button("Generate Test Cases"):
-        try:
-            response = client.chat.completions.create(model=model_name,
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant that generates test cases."},
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=1000,
-            n=1,
-            stop=None,
-            temperature=0.7)
-            test_cases = response.choices[0].message.content  # Update the test_cases variable
-            st.write("Generated Test Cases:")
-            st.write(test_cases)
-        except Exception as e:
-            st.error(f"Error occurred while generating test cases: {str(e)}")
-
-    if test_cases:
-        st.download_button(
-            label="Download Test Cases",
-            data=test_cases,
-            file_name="test_cases.txt",
-            mime="text/plain"
-        )
+    # Generate the response using Langchain and OpenAI
+    response = chat_chain.complete(st.session_state['chat_history'])['text']
+    
+    # Append the bot's response to the chat history
+    st.session_state['chat_history'].append({"speaker": "bot", "text": response})
+    
+    # Display the conversation
+    chat_text = "\n".join([f"{msg['speaker'].title()}: {msg['text']}" for msg in st.session_state['chat_history']])
+    st.text_area('Chat:', value=chat_text, height=300, disabled=True)

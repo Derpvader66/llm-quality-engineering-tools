@@ -15,7 +15,8 @@ st.write("OPEN_AI_KEY", st.secrets["OPENAI_API_KEY"])
 st.markdown("Upload your business process documents and user documentation files to generate test cases.")
 # Sidebar
 st.sidebar.header("OpenAI API Key")
-openai_api_key = st.sidebar.text_input("Enter your OpenAI API Key", type="password")
+openai_api_key = st.secrets["OPENAI_API_KEY"])
+# openai_api_key = st.sidebar.text_input("Enter your OpenAI API Key", type="password")
 # Example test case format
 example_test_case = """
 Test Case ID: TC001

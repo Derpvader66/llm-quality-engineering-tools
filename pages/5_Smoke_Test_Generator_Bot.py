@@ -5,7 +5,7 @@ from langchain.memory import ConversationBufferMemory
 from langchain.prompts.prompt import PromptTemplate
 
 # Streamlit app title
-st.title("Quality Engineering Chatbot")
+st.title("Smoke Test Generator")
 
 # OpenAI API key
 openai_api_key = st.secrets["OPENAI_API_KEY"]

@@ -38,7 +38,7 @@ def process_files(uploaded_files, directory):
        for uploaded_file in uploaded_files:
            with open(os.path.join(directory, uploaded_file.name), "wb") as f:
                f.write(uploaded_file.getbuffer())
-    # st.success(f"{len(uploaded_files)} file(s) uploaded successfully to {directory}!")
+       st.success(f"{len(uploaded_files)} file(s) uploaded successfully to {directory}!")
 # Generate test cases
 def generate_test_cases():
    # Load and process the documents

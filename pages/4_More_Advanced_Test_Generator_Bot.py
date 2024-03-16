@@ -1,5 +1,7 @@
 import streamlit as st
-from openai import ChatCompletion
+from openai import OpenAI
+
+client = OpenAI()
 
 st.set_page_config(page_title="Test Case Generator", page_icon=":memo:")
 st.title("Test Case Generator")
@@ -27,17 +29,15 @@ if uploaded_file is not None:
     
     if st.button("Generate Test Cases"):
         try:
-            response = ChatCompletion.create(
-                model=model_name,
-                messages=[
-                    {"role": "system", "content": "You are a helpful assistant that generates test cases."},
-                    {"role": "user", "content": prompt}
-                ],
-                max_tokens=1000,
-                n=1,
-                stop=None,
-                temperature=0.7,
-            )
+            response = client.chat.completions.create(model=model_name,
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant that generates test cases."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=1000,
+            n=1,
+            stop=None,
+            temperature=0.7)
             test_cases = response.choices[0].message['content'].strip()  # Update the test_cases variable
             st.write("Generated Test Cases:")
             st.write(test_cases)

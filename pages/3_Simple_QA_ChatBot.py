@@ -14,7 +14,7 @@ openai_api_key = st.secrets["OPENAI_API_KEY"]
 chat = ChatOpenAI(openai_api_key=openai_api_key)
 
 # Create a ConversationChain with a specific prompt
-prompt_template = """
+template = """
 You are a quality engineering assistant. Your role is to help with various aspects of the quality engineering process.
 You can provide guidance on test planning, test case design, defect management, and continuous improvement.
 Feel free to ask for more details or clarification if needed.
@@ -26,14 +26,14 @@ Assistant:"""
 
 prompt = PromptTemplate(
     input_variables=["history", "input"],
-    template=prompt_template
+    template=template
 )
 
 # Initialize ConversationChain with the prompt and memory
 conversation = ConversationChain(
     llm=chat,
     prompt=prompt,
-    memory=ConversationBufferMemory(chat_memory={"human_prefix": "Human", "ai_prefix": "Assistant"})
+    memory=ConversationBufferMemory(memory_key="history", input_key="input")
 )
 
 # Chat interface

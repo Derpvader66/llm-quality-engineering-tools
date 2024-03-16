@@ -1,5 +1,11 @@
-altair
-numpy
-pandas
-pydeck
 streamlit
+langchain
+openai
+faiss-cpu
+pdf2image
+pillow
+tiktoken
+numpy
+unstructured
+python-docx
+langchain-community

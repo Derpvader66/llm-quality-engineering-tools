@@ -27,7 +27,7 @@ if uploaded_file is not None:
     
     if st.button("Generate Test Cases"):
         try:
-            response = client.completions.create(engine="text-davinci-003",
+            response = client.completions.create(model="text-davinci-003",
             prompt=prompt,
             max_tokens=1000,
             n=1,

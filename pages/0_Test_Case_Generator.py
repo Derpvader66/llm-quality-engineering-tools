@@ -50,25 +50,13 @@ def generate_test_cases():
    business_docs = UnstructuredFileLoader(["business_process_docs/" + f for f in os.listdir("business_process_docs")]).load()
    user_docs = UnstructuredFileLoader(["user_documentation/" + f for f in os.listdir("user_documentation")]).load()
    docs = business_docs + user_docs
-   st.write(business_docs)
-   # Split the documents into chunks
-   #text_splitter = CharacterTextSplitter(chunk_size=4096, chunk_overlap=0)
-   text_splitter = CharacterTextSplitter()
+   text_splitter = CharacterTextSplitter(chunk_size=4096, chunk_overlap=0)
    texts = text_splitter.split_documents(docs)
-   #st.header("DOCS")
-   #st.write(texts)
-   # Create embeddings and vector store
    embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
    db = FAISS.from_documents(texts, embeddings)
-   # Initialize the question-answering chain
    chain = load_qa_chain(OpenAI(openai_api_key=openai_api_key, temperature=0), chain_type="stuff")
-   # Generate test cases
    query = f"Summarize the business process.  List the activities that make up the process.  Do not include any steps for an activity.\n"
    bp_summary = chain.run(input_documents=db.similarity_search(query), question=query)
-   st.header("Business Process Summary")
-   st.write(bp_summary)
-
-   #query = f"Generate a list of 20 test cases based on business process and user documentation. DO NOT INCLUDE THE EXAMPLE FORMAT IN THE OUTPUT Follow the format:\n{example_test_case}"
 
    query = f"Generate a detailed test case based on business process and user documentation. DO NOT INCLUDE THE EXAMPLE FORMAT IN THE OUTPUT."
    test_cases = chain.run(input_documents=db.similarity_search(query), question=query)

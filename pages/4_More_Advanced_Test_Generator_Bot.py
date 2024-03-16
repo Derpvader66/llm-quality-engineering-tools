@@ -38,11 +38,13 @@ prompt = PromptTemplate(
 conversation = ConversationChain(
     llm=chat,
     prompt=prompt,
-    memory=ConversationBufferMemory(memory_key="history", input_key="input", human_prefix="Human", ai_prefix="Assistant")
+    memory=ConversationBufferMemory(memory_key="history", input_key="input")
 )
 
 # File upload
 uploaded_file = st.file_uploader("Upload Business Process Documentation (PDF)", type=["pdf"])
+
+documentation_text = ""
 
 if uploaded_file is not None:
     try:
@@ -56,33 +58,31 @@ if uploaded_file is not None:
         st.write("Extracted Text:")
         st.write(documentation_text)
 
-        # Chat interface
-        st.header("Chat with the Quality Engineering Assistant")
-
-        # Get user input
-        user_input = st.text_input("You:", "")
-
-        if user_input:
-            # Pass user input and documentation to the conversation chain
-            output = conversation.predict(input=user_input, documentation=documentation_text)
-
-            # Display assistant's response
-            st.text_area("Assistant:", value=output, height=200, max_chars=None)
-
-        # Clear chat history button
-        if st.button("Clear Chat History"):
-            conversation.memory.clear()
-
-        # Download test cases button
-        if st.button("Download Test Cases"):
-            st.download_button(
-                label="Download",
-                data=output,
-                file_name="test_cases.txt",
-                mime="text/plain"
-            )
-
     except Exception as e:
         st.error(f"Error occurred while reading the PDF file: {str(e)}")
-else:
-    st.write("Please upload a business process documentation file (PDF) to generate test cases.")
+
+# Chat interface
+st.header("Chat with the Quality Engineering Assistant")
+
+# Get user input
+user_input = st.text_input("You:", "")
+
+if user_input:
+    # Pass user input and documentation to the conversation chain
+    output = conversation.predict(input=user_input, documentation=documentation_text)
+
+    # Display assistant's response
+    st.text_area("Assistant:", value=output, height=200, max_chars=None)
+
+# Clear chat history button
+if st.button("Clear Chat History"):
+    conversation.memory.clear()
+
+# Download test cases button
+if output:
+    st.download_button(
+        label="Download Test Cases",
+        data=output,
+        file_name="test_cases.txt",
+        mime="text/plain"
+    )

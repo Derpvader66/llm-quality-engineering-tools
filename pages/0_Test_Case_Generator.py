@@ -40,6 +40,7 @@ def process_files(uploaded_files, directory):
                f.write(uploaded_file.getbuffer())
        st.success(f"{len(uploaded_files)} file(s) uploaded successfully to {directory}!")
 # Generate test cases
+       
 def generate_test_cases():
    # Load and process the documents
    business_docs = UnstructuredFileLoader(["business_process_docs/" + f for f in os.listdir("business_process_docs")]).load()
@@ -60,8 +61,8 @@ def generate_test_cases():
    shutil.rmtree("business_process_docs")
    shutil.rmtree("user_documentation")
 
-   process_files(uploaded_business_files, "business_process_docs")
-   process_files(uploaded_user_files, "user_documentation")
+process_files(uploaded_business_files, "business_process_docs")
+process_files(uploaded_user_files, "user_documentation")
 
 if st.button("Generate Test Cases"):
    if openai_api_key:

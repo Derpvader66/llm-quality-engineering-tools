@@ -1,11 +1,22 @@
 import streamlit as st
+
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import ConversationChain
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts.prompt import PromptTemplate
 
 # Streamlit app title
-st.title("Smoke Test Generator")
+st.title("Manual Test Generator")
+
+# Description
+st.write("This bot takes a story, spec or user guide and generates manual test cases from it. To get started, add your document, modify the prompt (if needed) and hit go!")
+
+# File upload
+uploaded_file = st.file_uploader("Choose a file", type=["txt", "docx", "pdf"])
+
+# Prompt
+prompt_text = "Read through the attached Quick Reference Guide word document closely, summarizing the key steps of the business process. Then, write out a detailed manual test case that covers each of the steps, inputs, and expected outputs of the business process. The test case should be written clearly enough that someone unfamiliar with the process could execute it successfully. Make sure to include:\n\n- A descriptive test case name\n- Any prerequisite steps\n- Create realistic test data\n- Step-by-step actions to take\n- Inputs and data to use at each step\n- Expected system responses and outputs at each step\n- Any cleanup steps to reset the state for the next test run\n\nThe test case should cover the normal successful path through the business process.\n\nIn summary, please read through the attached Quick Reference Guide and write a comprehensive manual test case that covers the end-to-end business process flow and key validation points, written clearly enough for someone new to follow and execute."
+prompt_input = st.text_area("Prompt", value=prompt_text, height=300)
 
 # OpenAI API key
 openai_api_key = st.secrets["OPENAI_API_KEY"]
@@ -13,44 +24,10 @@ openai_api_key = st.secrets["OPENAI_API_KEY"]
 # Initialize the OpenAI chat model
 chat = ChatOpenAI(openai_api_key=openai_api_key)
 
-
-# Create a ConversationChain with a specific prompt
-template = """
-You are a quality engineering assistant named QEA. Your role is to help with various aspects of the quality engineering process, including generating smoke tests for key workflows.
-When a user requests a smoke test, follow this template:
-ID: [Test Case ID]
-Title: [Workflow Name]
-Description:
-This test case verifies the steps for the [Workflow Name] workflow. Summarize the objective of the quick reference guide.
-Prerequisites:
-List any prerequisites for the test case like user roles, sample data, etc
-Test Steps:
-| **Test Steps** | **Expected Result** |
-| --- | --- |
-| 1. Navigate to the case and select the item with multiple documents | Event 72 details page displays |
-| --- | --- |
-| 2. Click the Documents icon or button |
- | Document selection dialog opens | Dialog titled "Select Document" displays with list of documents (matches solution for updated Select Document dialog) |
-| 3. Select multiple document checkboxes | Checkboxes next to Doc1, Doc3 and Doc5 are checked (matches solution for added checkboxes) |
-| 4. Click Continue |
- | Document viewer opens with Doc1 displayed |
-| 5. Verify other selected documents are listed | Doc3 and Doc5 names display in order of oldest to newest (matches solution for listing selected docs oldest to newest) |
-| 6. Click the document names to change docs | Contents of Doc3 and Doc5 display after clicking their names (matches solution for changing displayed doc) |
-Populate the [Test Case ID] and [Workflow Name] fields. In the Description, summarize the purpose of the workflow being tested. List any prerequisite user roles, sample data, or configuration needed for the test.
-In the Test Steps table, provide 5 concise steps to execute the test case. For each step, describe the expected result that should occur if the workflow is functioning properly.
-Focus on the key interactions a user would have with the system to complete the workflow. The test steps should be high-level and easy for testers to follow.
-If the user provides additional details or requirements for the smoke test, incorporate them into the generated test case.
-Feel free to ask for more details or clarification if needed to generate a comprehensive smoke test.
-
-
-History:
-{history}
-Human: {input}
-Assistant:"""
-
+# Create a ConversationChain with the prompt
 prompt = PromptTemplate(
     input_variables=["history", "input"],
-    template=template
+    template=prompt_input
 )
 
 # Initialize ConversationChain with the prompt and memory
@@ -60,15 +37,16 @@ conversation = ConversationChain(
     memory=ConversationBufferMemory(memory_key="history", input_key="input")
 )
 
-# Chat interface
-st.header("Chat with the Quality Engineering Assistant")
-
-# Get user input
-user_input = st.text_input("You:", "")
-
-if user_input:
-    # Pass user input to the conversation chain
-    output = conversation.predict(input=user_input)
-    
-    # Display assistant's response
-    st.text_area("Assistant:", value=output, height=200, max_chars=None)
+# Generate test case
+if st.button("Submit"):
+    if uploaded_file is not None:
+        # Read the contents of the uploaded file
+        file_contents = uploaded_file.read().decode("utf-8")
+        
+        # Pass the file contents to the conversation chain
+        output = conversation.predict(input=file_contents)
+        
+        # Display the generated test case
+        st.text_area("Generated Test Case", value=output, height=400)
+    else:
+        st.warning("Please upload a file before submitting.")

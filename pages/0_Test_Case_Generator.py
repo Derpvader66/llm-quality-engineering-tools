@@ -11,6 +11,7 @@ from langchain.llms import OpenAI
 st.set_page_config(page_title="Test Case Generator", page_icon=":memo:")
 # App title and description
 st.title("Test Case Generator")
+st.write("OPEN_AI_KEY", st.secrets["OPENAI_API_KEY"])
 st.markdown("Upload your business process documents and user documentation files to generate test cases.")
 # Sidebar
 st.sidebar.header("OpenAI API Key")

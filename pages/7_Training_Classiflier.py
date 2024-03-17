@@ -1,55 +1,68 @@
 import streamlit as st
-from PyPDF2 import PdfReader
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.svm import SVC
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
+import fitz  # PyMuPDF
+import spacy
+import os
 
-# Function to extract text content from PDF files
-def extract_text_from_pdfs(uploaded_files):
-    texts = []
-    for pdf_file in uploaded_files:
-        text = ""
-        pdf_reader = PdfReader(pdf_file)
-        for page in pdf_reader.pages:
-            text += page.extract_text() or " "
-        texts.append(text.strip())
-    return texts
+# Load the English tokenizer, tagger, parser, NER, and word vectors
+nlp = spacy.load("en_core_web_sm")
 
-# Input for specifying labels
-label_list = st.text_input("Enter labels separated by commas").split(',')
-label_list = [label.strip() for label in label_list if label.strip()]  # Clean and filter empty labels
+def extract_text_from_pdf(document):
+    """
+    Extract text from each page of the uploaded PDF document.
+    
+    :param document: The uploaded PDF document.
+    :return: Extracted text.
+    """
+    text = ""
+    with fitz.open(stream=document.read()) as doc:
+        for page in doc:
+            text += page.get_text()
+    return text
 
-if label_list and len(set(label_list)) > 1:
-    # Define file upload component
-    uploaded_files = st.file_uploader("Upload PDF files", type="pdf", accept_multiple_files=True)
+def identify_actions(text):
+    """
+    Identify potential actions in the text using NLP.
+    
+    :param text: The text to process.
+    :return: A list of actions and targets.
+    """
+    actions = []
+    doc = nlp(text)
+    for sent in doc.sents:
+        action = None
+        target = None
 
-    if uploaded_files:
-        texts = extract_text_from_pdfs(uploaded_files)
+        for token in sent:
+            if token.pos_ == "VERB":
+                action = token.text
+                for child in token.children:
+                    if child.dep_ == "dobj":
+                        target = child.text
+                        break
 
-        # Create a select box for each uploaded file to assign labels
-        labels = [st.selectbox(f"Label for {pdf_file.name}:", label_list) for pdf_file in uploaded_files if texts[uploaded_files.index(pdf_file)].strip()]
+        if action and target:
+            actions.append(f"Action: {action}, Target: {target}")
+    return actions
 
-        # Vectorize text using TF-IDF
-        tfidf_vectorizer = TfidfVectorizer()
-        X = tfidf_vectorizer.fit_transform(texts)
+# Streamlit app
+st.title("Business Process Step Extractor")
 
-        # Map labels to numeric values
-        label_mapping = {label: idx for idx, label in enumerate(set(labels))}
-        y = [label_mapping[label] for label in labels]
+uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
 
-        # Split data into training and testing sets
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+if uploaded_file is not None:
+    # Extract text from PDF
+    extracted_text = extract_text_from_pdf(uploaded_file)
+    
+    # Display extracted text (optional, you can comment this out)
+    st.text_area("Extracted Text", extracted_text, height=250)
 
-        # Train SVM classifier
-        svm_classifier = SVC(kernel='linear')
-        svm_classifier.fit(X_train, y_train)
+    # Identify actions in the extracted text
+    actions = identify_actions(extracted_text)
 
-        # Evaluate classifier
-        y_pred = svm_classifier.predict(X_test)
-        st.write("Classification Report:")
-        st.write(classification_report(y_test, y_pred, target_names=label_mapping.keys()))
+    if actions:
+        st.subheader("Identified Actions")
+        for action in actions:
+            st.write(action)
     else:
-        st.info("Upload PDF files to start the classification process.")
-else:
-      st.error("Please specify at least two unique labels.")
+        st.write("No actions identified.")
+

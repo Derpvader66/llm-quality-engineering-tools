@@ -18,7 +18,7 @@ def extract_text_from_pdf(document):
     pdfReader = PyPDF2.PdfReader(io.BytesIO(document.read()))
     # Iterate through each page and extract text
     for page_num in range(len(pdfReader.pages)):
-        page = pdfReader.getPage(page_num)
+        page = pdfReader.get_page_number(page_num)
         text += page.extract_text()
     return text
 

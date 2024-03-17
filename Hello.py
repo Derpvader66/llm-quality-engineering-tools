@@ -27,7 +27,7 @@ def run():
     st.write("# Quality Engineering LLM Toolkit! 👋")
 
     st.sidebar.header("Instructions")
-    st.sidebar.success("Select a demo above.")
+#    st.sidebar.success("Select a demo above.")
 
     st.markdown(
         """

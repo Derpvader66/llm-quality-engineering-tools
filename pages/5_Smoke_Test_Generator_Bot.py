@@ -26,7 +26,7 @@ chat = ChatOpenAI(openai_api_key=openai_api_key)
 
 # Create a ConversationChain with the prompt
 prompt = PromptTemplate(
-    input_variables=["history", "input"],
+    input_variables=["input"],
     template=prompt_input
 )
 
@@ -34,7 +34,7 @@ prompt = PromptTemplate(
 conversation = ConversationChain(
     llm=chat,
     prompt=prompt,
-    memory=ConversationBufferMemory(memory_key="history", input_key="input")
+    memory=ConversationBufferMemory(input_key="input")
 )
 
 # Generate test case

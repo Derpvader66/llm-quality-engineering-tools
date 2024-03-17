@@ -27,7 +27,7 @@ if uploaded_files:
             labels.append(st.text_input(f"Label for {pdf_file.name}:"))
         else:
             st.warning(f"No text extracted from {pdf_file.name}. File skipped.")
-
+if st.button("Generate Test Cases"):
     if len(set(labels)) > 1:  # Proceed only if there are at least two unique labels
         # Convert labels to numeric values
         label_mapping = {label: idx for idx, label in enumerate(set(labels))}

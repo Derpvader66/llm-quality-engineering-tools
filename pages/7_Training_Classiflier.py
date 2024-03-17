@@ -1,6 +1,6 @@
 import streamlit as st
 import os
-import PyPDF2
+from PyPDF2 import PdfReader
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
@@ -8,10 +8,9 @@ from sklearn.metrics import classification_report
 
 # Function to extract text content from PDF files
 def extract_text_from_pdf(pdf_file):
-    pdf_reader = PyPDF2.PdfFileReader(pdf_file)
     text = ""
-    for page_num in range(pdf_reader.numPages):
-        text += pdf_reader.getPage(page_num).extractText()
+    for page in pdf_file.pages:
+        text += page.extract_text()
     return text
 
 # Define file upload component
@@ -23,7 +22,8 @@ if uploaded_files:
     texts = []
     labels = []
     for pdf_file in uploaded_files:
-        text = extract_text_from_pdf(pdf_file)
+        pdf_reader = PdfReader(pdf_file)
+        text = extract_text_from_pdf(pdf_reader)
         texts.append(text)
         labels.append(st.text_input(f"Label for {pdf_file.name}:"))
 

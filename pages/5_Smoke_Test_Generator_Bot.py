@@ -1,8 +1,7 @@
 import streamlit as st
 
 from langchain.chat_models import ChatOpenAI
-from langchain.chains import ConversationChain
-from langchain.memory import ConversationBufferMemory
+from langchain.chains import LLMChain
 from langchain.prompts.prompt import PromptTemplate
 
 # Streamlit app title
@@ -24,18 +23,14 @@ openai_api_key = st.secrets["OPENAI_API_KEY"]
 # Initialize the OpenAI chat model
 chat = ChatOpenAI(openai_api_key=openai_api_key)
 
-# Create a ConversationChain with the prompt
+# Create a prompt template
 prompt = PromptTemplate(
     input_variables=["input"],
     template=prompt_input
 )
 
-# Initialize ConversationChain with the prompt and memory
-conversation = ConversationChain(
-    llm=chat,
-    prompt=prompt,
-    memory=ConversationBufferMemory(input_key="input")
-)
+# Initialize LLMChain with the prompt
+chain = LLMChain(llm=chat, prompt=prompt)
 
 # Generate test case
 if st.button("Submit"):
@@ -43,8 +38,8 @@ if st.button("Submit"):
         # Read the contents of the uploaded file
         file_contents = uploaded_file.read().decode("utf-8")
         
-        # Pass the file contents to the conversation chain
-        output = conversation.predict(input=file_contents)
+        # Pass the file contents to the LLMChain
+        output = chain.run(input=file_contents)
         
         # Display the generated test case
         st.text_area("Generated Test Case", value=output, height=400)

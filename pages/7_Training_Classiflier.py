@@ -4,7 +4,8 @@ import io
 import spacy
 
 # Load the English tokenizer, tagger, parser, NER, and word vectors
-nlp = spacy.load("en_core_web_sm")
+# Ensuring we're using the latest English model available for spaCy
+nlp = spacy.load("en_core_web_trf")
 
 def extract_text_from_pdf(document):
     """
@@ -18,7 +19,7 @@ def extract_text_from_pdf(document):
     pdfReader = PyPDF2.PdfReader(io.BytesIO(document.read()))
     # Iterate through each page and extract text
     for page_num in range(len(pdfReader.pages)):
-        page = pdfReader.get_page_number(page_num)
+        page = pdfReader.get_page(page_num)  # Using get_page for newer versions
         text += page.extract_text()
     return text
 
@@ -68,4 +69,3 @@ if uploaded_file is not None:
             st.write(action)
     else:
         st.write("No actions identified.")
-

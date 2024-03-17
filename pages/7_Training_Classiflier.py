@@ -1,22 +1,25 @@
 import streamlit as st
-import fitz  # PyMuPDF
+import PyPDF2
+import io
 import spacy
-import os
 
 # Load the English tokenizer, tagger, parser, NER, and word vectors
 nlp = spacy.load("en_core_web_sm")
 
 def extract_text_from_pdf(document):
     """
-    Extract text from each page of the uploaded PDF document.
+    Extract text from each page of the uploaded PDF document using PyPDF2.
     
     :param document: The uploaded PDF document.
     :return: Extracted text.
     """
     text = ""
-    with fitz.open(stream=document.read()) as doc:
-        for page in doc:
-            text += page.get_text()
+    # Read the PDF file
+    pdfReader = PyPDF2.PdfReader(io.BytesIO(document.read()))
+    # Iterate through each page and extract text
+    for page_num in range(len(pdfReader.pages)):
+        page = pdfReader.getPage(page_num)
+        text += page.extract_text()
     return text
 
 def identify_actions(text):
@@ -53,7 +56,7 @@ if uploaded_file is not None:
     # Extract text from PDF
     extracted_text = extract_text_from_pdf(uploaded_file)
     
-    # Display extracted text (optional, you can comment this out)
+    # Display extracted text (optional)
     st.text_area("Extracted Text", extracted_text, height=250)
 
     # Identify actions in the extracted text

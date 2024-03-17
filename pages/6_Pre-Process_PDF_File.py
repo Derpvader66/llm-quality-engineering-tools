@@ -4,6 +4,9 @@ import re
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
+import nltk
+
+nltk.download()
 
 # Initializing the stopwords set outside the function for efficiency
 stop_words = set(stopwords.words('english'))
